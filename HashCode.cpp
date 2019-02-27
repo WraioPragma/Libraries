@@ -1,11 +1,11 @@
-// HashCode.cpp : This file contains the 'main' function. Program execution begins and ends there.
-//
-
 #include "pch.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <windows.h>
+#include <filesystem>
 
+namespace fs = std::filesystem;
 using namespace std;
 
 void start(string inputName) {
@@ -14,7 +14,7 @@ void start(string inputName) {
 	string in;
 	while (getline(input,in)) {
 		//Do: stuff
-		output << in << endl;
+		output << "End!!" << endl;
 	}
 	
 	
@@ -22,20 +22,19 @@ void start(string inputName) {
 
 int main()
 {
-	string inputsArray[5] = { "a_example", "b_should_be_easy", "c_no_hurry","d_metropolis","e_high_bonus"};
-	for (string inputName : inputsArray) {
-		start(inputName);
-
+	string inputsArray[5];													// array with filenames to process
+	string path = "D:\\Projects\\HashCode\\HashCode\\";						// working directory
+	int counter = 0;														
+	for (const auto & entry : fs::directory_iterator(path)) {				// iterate the list of files in working directory
+		if (entry.path().extension() == ".in") {							// get only .in files
+			string fullName = entry.path().filename().string();				// get filename (with extension)
+			inputsArray[counter] = fullName.substr(0, fullName.size() - 3); // remove extension 
+			counter++;														// increment counter			
+		}
 	}
+
+	for (string inputName : inputsArray) {									
+		start(inputName);													
+	}
+	return 0;
 }
-
-// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
-// Debug program: F5 or Debug > Start Debugging menu
-
-// Tips for Getting Started: 
-//   1. Use the Solution Explorer window to add/manage files
-//   2. Use the Team Explorer window to connect to source control
-//   3. Use the Output window to see build output and other messages
-//   4. Use the Error List window to view errors
-//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
-//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file
