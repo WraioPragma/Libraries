@@ -61,32 +61,22 @@ vi merge(vi &one, vi &two)
 {
 	vi temp;
 	for(int x : one){
+		bool ok = true;
 		for(int y : temp){
 			if(y == x) {
-				temp.push_back(x);
-				break;
+				ok = false;
 			}
 		}
+		if(ok) temp.push_back(x);
 	}
 	for(int x : two){
+		bool ok = true;
 		for(int y : temp){
 			if(y == x) {
-				temp.push_back(x);
-				break;
+				ok = false;
 			}
 		}
+		if(ok) temp.push_back(x);
 	}
 	return temp;
-}
-
-
-void printSlideShow(vector<pair<int,int>> &output)
-{
-	cout<< output.size() << "\n";
-	for (int j=0; j<output.size(); j++)
-	{
-		cout << output[j].first ;
-		if (output[j].second != -1) cout << " " << output[j].second << "\n";
-		else cout << "\n";
-	}
 }
