@@ -1,7 +1,6 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include <windows.h>
 #include <vector>
 #include <stack>
 #include <queue>
@@ -64,6 +63,12 @@ vi merge(vi &one, vi &two);
 vector<int> tomh(vi &one, vi &two);
 
 void init(string inputName) {
+	freqH.clear();
+	freqV.clear();
+	photos.clear();
+	uniqueTags.clear();
+	vecUn.clear();
+	slsh.clear();
 	cur = inputName;
 	ifstream input(inputName + ".txt");
 	string in;
