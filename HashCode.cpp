@@ -13,6 +13,12 @@
 #include <map>
 #define forn for(int i=0;i<n;i++)
 
+#define ll long long
+#define pi pair<int,int>
+#define pll pair<long,long>
+#define f first
+#define s second
+#define vi vector<int>
 using namespace std;
 
 
@@ -45,10 +51,17 @@ vector<int> freqV;
 vector<Photos> photos;
 set<string> uniqueTags;
 map<string,int> vecUn;
+vector<pair<int,int>> slsh;
 void init(string inputName);
-void execAlg();
+void pairPhotos();
 void printSlideShow(vector<pair<int,int>> &output);
 void initFreq();
+double score(vector<pair<int,int>> &output);
+double score_slide_trans(pi &one, pi &two);
+vi tags_slide(int p1, int p2);
+
+vi merge(vi &one, vi &two);
+vector<int> tomh(vi &one, vi &two);
 
 void init(string inputName) {
 	cur = inputName;
@@ -83,12 +96,12 @@ void init(string inputName) {
 		}
 	}
 	
-	execAlg();
+	pairPhotos();
 }
 
 void initFreq() {
-	freqV.resize(vecUn.size(), 0)
-	freqH.resize(vecUn.size(), 0)
+	freqV.resize(vecUn.size(), 0);
+	freqH.resize(vecUn.size(), 0);
 	for(Photos ph : photos) {
 		if (ph.horizontal) {
 			for(int tgd: ph.tags_int)
@@ -101,10 +114,106 @@ void initFreq() {
 	}
 }
 
-void execAlg() {
+void pairPhotos() {
+	int lastV = -1;
 	
+	for (Photos &ph : photos) {
+		if (!ph.horizontal) {
+			if(lastV == -1) {
+				lastV = ph.id;
+			} else {
+				slsh.push_back(make_pair(lastV,ph.id));
+				lastV = -1;
+			}
+		} else {
+			slsh.push_back(make_pair(ph.id, -1));
+		}
+	}
+	
+	printSlideShow(slsh); 
+	cerr << score(slsh) << endl;
+}
+double score(vector<pair<int,int>> &output)
+{
+	double sc = 0;
+	for(int i = 0; i<output.size()-1;i++){
+		pi one = output[i];
+		pi two = output[i+1];
+		int inc_val = score_slide_trans(one,two);
+		sc = sc + inc_val;
+	}
+	return sc;
 }
 
+
+double score_slide_trans(pi &one, pi &two)
+{
+	int id1 = one.first;
+		int id2 = one.second;
+		int id3 = two.first;
+		int id4 = two.second;
+		vi sl1 = tags_slide(id1,id2);
+		vi sl2 = tags_slide(id3,id4);
+
+		vi common = tomh(sl1,sl2);
+
+		int common_size = common.size();
+		int unique1 = sl1.size() - common_size;
+		int unique2 = sl2.size() - common_size;
+
+		int inc_val = min(unique1,min(unique2,common_size));
+		return inc_val;
+}
+
+vi tags_slide(int p1, int p2)
+{
+	vi temp = photos[p1].tags_int;
+	if(p2 != -1){
+			vi t2 = photos[p2].tags_int;
+			vi temp3 = merge(temp,t2);
+			temp = temp3;
+	}
+	return temp;
+}
+
+vector<int> tomh(vi &one, vi &two)
+{
+	vi temp;
+	for(int x : one){
+		for(int y : two){
+			if(y == x) {
+				temp.push_back(x);
+				break;
+			}
+		}
+	}
+	return temp;
+}
+
+
+vi merge(vi &one, vi &two)
+{
+	vi temp;
+	for(int x : one){
+		bool ok = true;
+		for(int y : temp){
+			if(y == x) {
+				ok = false;
+			}
+		}
+		if(ok) temp.push_back(x);
+	}
+	for(int x : two){
+		bool ok = true;
+		for(int y : temp){
+			if(y == x) {
+				ok = false;
+			}
+		}
+		if(ok) temp.push_back(x);
+	}
+	return temp;
+}
 void printSlideShow(vector<pair<int,int>> &output)
 {
 	ofstream out(cur + "_out.out");
@@ -124,11 +233,11 @@ int main()
 	string inputsArray[5] = {"a_example","b_lovely_landscapes","c_memorable_moments","d_pet_pictures","e_shiny_selfies"};													// array with filenames to process
 	
 	
-	//for (string inputName : inputsArray) {									
-	//	cout << inputName << endl;
-	//	init(inputName);
-		init(inputsArray[1]);													
-	//}
+	for (string inputName : inputsArray) {									
+		cout << inputName << endl;
+		init(inputName);
+	//	init(inputsArray[1]);													
+	}
 	return 0;
 }
 #pragma endregion end of main
