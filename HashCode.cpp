@@ -51,8 +51,15 @@ vector<Photos> photos;
 set<string> uniqueTags;
 map<string,int> vecUn;
 vector<pair<int,int>> slsh;
+
+vector<int>length;
+vector<int>freqs;
+vector<pair<int,double> >score1;
+vector<pair<int,double> >score2;
+vector<pair<int,double> >score3;
+vector<pi>pairs;
 void init(string inputName);
-void pairPhotos();
+void pairPhotos(vector<pi>);
 void printSlideShow(vector<pair<int,int>> &output);
 void initFreq();
 double score(vector<pair<int,int>> &output);
@@ -61,6 +68,7 @@ vi tags_slide(int p1, int p2);
 
 vi merge(vi &one, vi &two);
 vector<int> tomh(vi &one, vi &two);
+void pairit();
 
 void init(string inputName) {
 	freqH.clear();
@@ -69,6 +77,12 @@ void init(string inputName) {
 	uniqueTags.clear();
 	vecUn.clear();
 	slsh.clear();
+	length.clear();
+freqs.clear();
+score1.clear();
+score2.clear();
+score3.clear();
+pairs.clear();
 	cur = inputName;
 	ifstream input(inputName + ".txt");
 	string in;
@@ -100,7 +114,10 @@ void init(string inputName) {
 			ph.tags_int.push_back(vecUn[str]);
 		}
 	}
-	pairPhotos();
+	
+	initFreq();
+	pairit();
+	pairPhotos(pairs);
 }
 
 void initFreq() {
@@ -118,17 +135,14 @@ void initFreq() {
 	}
 }
 
-void pairPhotos() {
+void pairPhotos(vector<pi> templ) {
 	int lastV = -1;
 	
+	int counter = 0;
 	for (Photos &ph : photos) {
 		if (!ph.horizontal) {
-			if(lastV == -1) {
-				lastV = ph.id;
-			} else {
-				slsh.push_back(make_pair(lastV,ph.id));
-				lastV = -1;
-			}
+			if(counter < templ.size())
+				slsh.push_back(templ[counter++]);
 		} else {
 			slsh.push_back(make_pair(ph.id, -1));
 		}
@@ -229,6 +243,52 @@ void printSlideShow(vector<pair<int,int>> &output)
 		else out << "\n";
 	}
 }
+
+
+bool mycomp(pair<int,double> a, pair<int, double> b)
+{
+    return a.second<b.second;
+}
+
+
+
+void pairit()
+{
+    for(int i=0;i<photos.size();i++)
+    {
+        if(photos[i].horizontal)
+        {
+            continue;
+        }
+        length.push_back(photos[i].tags_int.size());
+        int sum=0;
+        for(int j=0;j<photos[i].tags_int.size();j++)
+        {
+            sum+=freqV[photos[i].tags_int[j]];
+        }
+        freqs.push_back(sum);
+    }
+    int count = 0;
+	for(int i=0;i<photos.size();i++)
+    {
+        if(photos[i].horizontal)
+        {
+            continue;
+        }
+        score1.push_back(make_pair(photos[i].id,length[count]*1.0/freqs[count]));
+        score2.push_back(make_pair(photos[i].id,length[count]*1.0));
+        score3.push_back(make_pair(photos[i].id,freqs[count]*1.0));
+		count++;
+    }
+    sort(score1.begin(),score1.end(),mycomp);
+    sort(score2.begin(),score2.end(),mycomp);
+    sort(score3.begin(),score3.end(),mycomp);
+    for(int i=0;i<score3.size()/2;i++)
+    {
+		//cout << score1[i].first << " " << score1[i].second << endl;
+        pairs.push_back(make_pair(score3[i].first,score3[score3.size()-1-i].first));
+    }
+}
 #pragma endregion main flow 
 
 #pragma region main
@@ -240,7 +300,7 @@ int main()
 	for (string inputName : inputsArray) {									
 		cout << inputName << endl;
 		init(inputName);
-	//	init(inputsArray[1]);													
+	//	init(inputsArray[0]);													
 	}
 	return 0;
 }
