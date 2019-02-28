@@ -10,6 +10,7 @@
 #include <cstring>
 #include <set>
 #include <map>
+#include <climits>
 #define forn for(int i=0;i<n;i++)
 
 #define ll long long
@@ -51,7 +52,7 @@ vector<Photos> photos;
 set<string> uniqueTags;
 map<string,int> vecUn;
 vector<pair<int,int>> slsh;
-
+vector<int>freq;
 vector<int>length;
 vector<int>freqs;
 vector<pair<int,double> >score1;
@@ -65,11 +66,13 @@ void initFreq();
 double score(vector<pair<int,int>> &output);
 double score_slide_trans(pi &one, pi &two);
 vi tags_slide(int p1, int p2);
-
+bool swap_slides_if_better(vector<pi> &output, int slide_one, int slide_two);
+void optimize_outp(vector<pi> & output);
 vi merge(vi &one, vi &two);
 vector<int> tomh(vi &one, vi &two);
 void pairit();
 
+#pragma region init
 void init(string inputName) {
 	freqH.clear();
 	freqV.clear();
@@ -78,6 +81,7 @@ void init(string inputName) {
 	vecUn.clear();
 	slsh.clear();
 	length.clear();
+	freq.clear();
 freqs.clear();
 score1.clear();
 score2.clear();
@@ -123,17 +127,25 @@ pairs.clear();
 void initFreq() {
 	freqV.resize(vecUn.size(), 0);
 	freqH.resize(vecUn.size(), 0);
+	freq.resize(vecUn.size(), 0);
 	for(Photos &ph : photos) {
 		if (ph.horizontal) {
-			for(int tgd: ph.tags_int)
+			for(int tgd: ph.tags_int) {
 				freqH[tgd]++;
+				freq[tgd]++;
+			}
 		}
 		else {
-			for(int tgd: ph.tags_int)
+			for(int tgd: ph.tags_int){
 				freqV[tgd]++;
+				freq[tgd]++;
+			}
 		}
+		
 	}
 }
+#pragma endregion jjjj
+
 
 void pairPhotos(vector<pi> templ) {
 	int lastV = -1;
@@ -147,7 +159,7 @@ void pairPhotos(vector<pi> templ) {
 			slsh.push_back(make_pair(ph.id, -1));
 		}
 	}
-	
+	optimize_outp(slsh);
 	printSlideShow(slsh); 
 	cerr << score(slsh) << endl;
 }
@@ -166,21 +178,23 @@ double score(vector<pair<int,int>> &output)
 
 double score_slide_trans(pi &one, pi &two)
 {
+	if (one == make_pair(-1, -1)) return 0;
+	if (two == make_pair(-1, -1)) return 0;
 	int id1 = one.first;
-		int id2 = one.second;
-		int id3 = two.first;
-		int id4 = two.second;
-		vi sl1 = tags_slide(id1,id2);
-		vi sl2 = tags_slide(id3,id4);
+	int id2 = one.second;
+	int id3 = two.first;
+	int id4 = two.second;
+	vi sl1 = tags_slide(id1, id2);
+	vi sl2 = tags_slide(id3, id4);
 
-		vi common = tomh(sl1,sl2);
+	vi common = tomh(sl1, sl2);
 
-		int common_size = common.size();
-		int unique1 = sl1.size() - common_size;
-		int unique2 = sl2.size() - common_size;
+	int common_size = common.size();
+	int unique1 = sl1.size() - common_size;
+	int unique2 = sl2.size() - common_size;
 
-		int inc_val = min(unique1,min(unique2,common_size));
-		return inc_val;
+	int inc_val = min(unique1, min(unique2, common_size));
+	return inc_val;
 }
 
 vi tags_slide(int p1, int p2)
@@ -289,6 +303,45 @@ void pairit()
         pairs.push_back(make_pair(score3[i].first,score3[score3.size()-1-i].first));
     }
 }
+
+bool swap_slides_if_better(vector<pi> &output, int slide_one, int slide_two)
+{
+	pi old1, curr1, next1;
+	pi old2, curr2, next2;
+	double score_beg = 0;
+	double score_end = 0;
+
+	old1 = (slide_one != 0) ? output[slide_one - 1] : make_pair(-1, -1);
+	curr1 = output[slide_one];
+	next1 = (slide_one != output.size()-1) ? output[slide_one + 1] : make_pair(-1, -1); 
+
+	old2 = (slide_two != 0) ? output[slide_two - 1] : make_pair(-1, -1);
+	curr2 = output[slide_two];
+	next2 = (slide_two != output.size() - 1) ? output[slide_two + 1] : make_pair(-1, -1);
+
+	score_beg = score_slide_trans(old1, curr1) + score_slide_trans(curr1, next1) + score_slide_trans(old2, curr2) + score_slide_trans(curr2, next2);
+	score_end = score_slide_trans(old1, curr2) + score_slide_trans(curr2, next1) + score_slide_trans(old2, curr1) + score_slide_trans(curr1, next2);
+
+	if (score_end > score_beg) {
+		swap(output[slide_one], output[slide_two]);
+		return true;
+	}
+	return false;
+}
+
+void optimize_outp(vector<pi> & output)
+{
+	int K = 10000;
+	//while (K--) {
+	for(int j = 0 ; j < K ; j ++){
+		int h = rand() % output.size();
+		for (int i = 0; i < 100; i++) {
+			int r = rand() % output.size();
+			if (swap_slides_if_better(output, h, r)) break;
+		}
+	}
+}
+
 #pragma endregion main flow 
 
 #pragma region main
