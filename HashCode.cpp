@@ -95,19 +95,18 @@ void init(string inputName) {
 		vecUn[str] = coun;
 		coun++;
 	}
-	for (Photos ph : photos) {
-		for (string str : ph.tags) {
+	for (Photos &ph : photos) {
+		for (string &str : ph.tags) {
 			ph.tags_int.push_back(vecUn[str]);
 		}
 	}
-	
 	pairPhotos();
 }
 
 void initFreq() {
 	freqV.resize(vecUn.size(), 0);
 	freqH.resize(vecUn.size(), 0);
-	for(Photos ph : photos) {
+	for(Photos &ph : photos) {
 		if (ph.horizontal) {
 			for(int tgd: ph.tags_int)
 				freqH[tgd]++;
