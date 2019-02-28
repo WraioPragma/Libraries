@@ -2,11 +2,22 @@
 double score(vector<pair<int,int>> &output)
 {
 	double sc = 0;
-	for(int i = 0; i<output.size();i++){
-		int id1 = output[i].first;
-		int id2 = output[i].second;
-		int id3 = output[i+1].first;
-		int id4 = output[i+1].second;
+	for(int i = 0; i<output.size()-1;i++){
+		pi one = output[i];
+		pi two = output[i+1];
+		int inc_val = score_slide_trans(one,two);
+		sc = sc + inc_val;
+	}
+	return sc;
+}
+
+
+double score_slide_trans(pi &one, pi &two)
+{
+	int id1 = one.first;
+		int id2 = one.second;
+		int id3 = two.first;
+		int id4 = two.second;
 		vi sl1 = tags_slide(id1,id2);
 		vi sl2 = tags_slide(id3,id4);
 
@@ -17,9 +28,7 @@ double score(vector<pair<int,int>> &output)
 		int unique2 = sl2.size() - common_size;
 
 		int inc_val = min(unique1,min(unique2,common_size));
-		sc = sc + inc_val;
-	}
-	return sc;
+		return inc_val;
 }
 
 vi tags_slide(int p1, int p2)
