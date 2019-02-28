@@ -154,6 +154,8 @@ double score(vector<pair<int,int>> &output)
 
 double score_slide_trans(pi &one, pi &two)
 {
+	if(one == make_pair(-1,-1)) return 0;
+	if(two == make_pair(-1,-1)) return 0;
 	int id1 = one.first;
 		int id2 = one.second;
 		int id3 = two.first;
