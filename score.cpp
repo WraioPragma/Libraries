@@ -80,3 +80,15 @@ vi merge(vi &one, vi &two)
 	}
 	return temp;
 }
+
+
+void printSlideShow(vector<pair<int,int>> &output)
+{
+	cout<< output.size() << "\n";
+	for (int j=0; j<output.size(); j++)
+	{
+		cout << output[j].first ;
+		if (output[j].second != -1) cout << " " << output[j].second << "\n";
+		else cout << "\n";
+	}
+}
